@@ -1,13 +1,13 @@
-import { describe, it } from 'mocha';
 import { expect } from 'chai';
+import { describe, it } from 'mocha';
 
 import {
-  offsetToCursor,
-  connectionFromArray,
-  connectionFromArraySlice,
-  connectionFromPromisedArray,
-  connectionFromPromisedArraySlice,
-  cursorForObjectInConnection,
+    connectionFromArray,
+    connectionFromArraySlice,
+    connectionFromPromisedArray,
+    connectionFromPromisedArraySlice,
+    cursorForObjectInConnection,
+    offsetToCursor,
 } from '../arrayConnection';
 
 const arrayABCDE = ['A', 'B', 'C', 'D', 'E'];
@@ -103,7 +103,7 @@ describe('connectionFromArray()', () => {
         pageInfo: {
           startCursor: cursorC,
           endCursor: cursorD,
-          hasPreviousPage: false,
+          hasPreviousPage: true,
           hasNextPage: true,
         },
       });
@@ -119,7 +119,7 @@ describe('connectionFromArray()', () => {
         pageInfo: {
           startCursor: cursorC,
           endCursor: cursorE,
-          hasPreviousPage: false,
+          hasPreviousPage: true,
           hasNextPage: false,
         },
       });
@@ -136,7 +136,7 @@ describe('connectionFromArray()', () => {
           startCursor: cursorB,
           endCursor: cursorC,
           hasPreviousPage: true,
-          hasNextPage: false,
+          hasNextPage: true,
         },
       });
     });
@@ -152,7 +152,7 @@ describe('connectionFromArray()', () => {
           startCursor: cursorA,
           endCursor: cursorC,
           hasPreviousPage: false,
-          hasNextPage: false,
+          hasNextPage: true,
         },
       });
     });
@@ -168,7 +168,7 @@ describe('connectionFromArray()', () => {
         pageInfo: {
           startCursor: cursorB,
           endCursor: cursorC,
-          hasPreviousPage: false,
+          hasPreviousPage: true,
           hasNextPage: true,
         },
       });
@@ -185,7 +185,7 @@ describe('connectionFromArray()', () => {
         pageInfo: {
           startCursor: cursorB,
           endCursor: cursorD,
-          hasPreviousPage: false,
+          hasPreviousPage: true,
           hasNextPage: false,
         },
       });
@@ -202,7 +202,7 @@ describe('connectionFromArray()', () => {
         pageInfo: {
           startCursor: cursorB,
           endCursor: cursorD,
-          hasPreviousPage: false,
+          hasPreviousPage: true,
           hasNextPage: false,
         },
       });
@@ -220,7 +220,7 @@ describe('connectionFromArray()', () => {
           startCursor: cursorC,
           endCursor: cursorD,
           hasPreviousPage: true,
-          hasNextPage: false,
+          hasNextPage: true,
         },
       });
     });
@@ -237,7 +237,7 @@ describe('connectionFromArray()', () => {
           startCursor: cursorB,
           endCursor: cursorD,
           hasPreviousPage: false,
-          hasNextPage: false,
+          hasNextPage: true,
         },
       });
     });
@@ -254,7 +254,7 @@ describe('connectionFromArray()', () => {
           startCursor: cursorB,
           endCursor: cursorD,
           hasPreviousPage: false,
-          hasNextPage: false,
+          hasNextPage: true,
         },
       });
     });
@@ -308,6 +308,8 @@ describe('connectionFromArray()', () => {
         },
       };
 
+      // before/after cursors out of range: offsets are outside [0, arrayLength)
+      // so neither hasPreviousPage nor hasNextPage is triggered
       expect(
         connectionFromArray(arrayABCDE, { before: offsetToCursor(6) }),
       ).to.deep.equal(allEdges);
@@ -333,8 +335,8 @@ describe('connectionFromArray()', () => {
         pageInfo: {
           startCursor: null,
           endCursor: null,
-          hasPreviousPage: false,
-          hasNextPage: false,
+          hasPreviousPage: true,
+          hasNextPage: true,
         },
       });
     });
@@ -404,7 +406,7 @@ describe('connectionFromArraySlice()', () => {
       pageInfo: {
         startCursor: cursorB,
         endCursor: cursorC,
-        hasPreviousPage: false,
+        hasPreviousPage: true,
         hasNextPage: true,
       },
     });
@@ -427,7 +429,7 @@ describe('connectionFromArraySlice()', () => {
       pageInfo: {
         startCursor: cursorB,
         endCursor: cursorC,
-        hasPreviousPage: false,
+        hasPreviousPage: true,
         hasNextPage: true,
       },
     });
@@ -450,7 +452,7 @@ describe('connectionFromArraySlice()', () => {
       pageInfo: {
         startCursor: cursorC,
         endCursor: cursorC,
-        hasPreviousPage: false,
+        hasPreviousPage: true,
         hasNextPage: true,
       },
     });
@@ -473,7 +475,7 @@ describe('connectionFromArraySlice()', () => {
       pageInfo: {
         startCursor: cursorC,
         endCursor: cursorC,
-        hasPreviousPage: false,
+        hasPreviousPage: true,
         hasNextPage: true,
       },
     });
@@ -496,7 +498,7 @@ describe('connectionFromArraySlice()', () => {
       pageInfo: {
         startCursor: cursorD,
         endCursor: cursorE,
-        hasPreviousPage: false,
+        hasPreviousPage: true,
         hasNextPage: false,
       },
     });
@@ -519,7 +521,7 @@ describe('connectionFromArraySlice()', () => {
       pageInfo: {
         startCursor: cursorC,
         endCursor: cursorD,
-        hasPreviousPage: false,
+        hasPreviousPage: true,
         hasNextPage: true,
       },
     });
@@ -542,7 +544,7 @@ describe('connectionFromArraySlice()', () => {
       pageInfo: {
         startCursor: cursorD,
         endCursor: cursorD,
-        hasPreviousPage: false,
+        hasPreviousPage: true,
         hasNextPage: true,
       },
     });

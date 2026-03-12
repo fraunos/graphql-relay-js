@@ -1,9 +1,9 @@
 import { base64, unbase64 } from '../utils/base64';
 
 import type {
-  Connection,
-  ConnectionArguments,
-  ConnectionCursor,
+    Connection,
+    ConnectionArguments,
+    ConnectionCursor,
 } from './connection';
 
 interface ArraySliceMetaInfo {
@@ -96,16 +96,49 @@ export function connectionFromArraySlice<T>(
 
   const firstEdge = edges[0];
   const lastEdge = edges[edges.length - 1];
-  const lowerBound = after != null ? afterOffset + 1 : 0;
-  const upperBound = before != null ? beforeOffset : arrayLength;
+
+  // Spec: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
+  //
+  // HasPreviousPage:
+  //   - If `last` is set: true if edges before the window were trimmed by `last`
+  //   - If `after` is set: true if elements exist prior to `after` (we can determine this efficiently)
+  //   - Otherwise: false
+  //
+  // HasNextPage:
+  //   - If `first` is set: true if edges after the window were trimmed by `first`
+  //   - If `before` is set: true if elements exist following `before` (we can determine this efficiently)
+  //   - Otherwise: false
+  let hasPreviousPage: boolean;
+  if (typeof last === 'number') {
+    // Did `last` trim edges from the front of the after/before window?
+    const lowerBound = after != null ? afterOffset + 1 : 0;
+    hasPreviousPage = startOffset > lowerBound;
+  } else if (after != null) {
+    // Elements exist prior to `after` if afterOffset is a valid position in the array
+    hasPreviousPage = afterOffset >= 0 && afterOffset < arrayLength;
+  } else {
+    hasPreviousPage = false;
+  }
+
+  let hasNextPage: boolean;
+  if (typeof first === 'number') {
+    // Did `first` trim edges from the end of the after/before window?
+    const upperBound = before != null ? beforeOffset : arrayLength;
+    hasNextPage = endOffset < upperBound;
+  } else if (before != null) {
+    // Elements exist following `before` if beforeOffset is a valid position in the array
+    hasNextPage = beforeOffset >= 0 && beforeOffset < arrayLength;
+  } else {
+    hasNextPage = false;
+  }
+
   return {
     edges,
     pageInfo: {
       startCursor: firstEdge ? firstEdge.cursor : null,
       endCursor: lastEdge ? lastEdge.cursor : null,
-      hasPreviousPage:
-        typeof last === 'number' ? startOffset > lowerBound : false,
-      hasNextPage: typeof first === 'number' ? endOffset < upperBound : false,
+      hasPreviousPage,
+      hasNextPage,
     },
   };
 }
